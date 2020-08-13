@@ -15,6 +15,7 @@ int M_Search(int A[], int B[], int n)
 {
     int i, j, k;
     i = j = k = 0;
+    
     while (i < n && j < n)
     {
         k++;
