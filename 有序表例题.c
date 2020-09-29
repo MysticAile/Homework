@@ -13,10 +13,10 @@
 //思路:采用归并的方法只需要标记即可
 int M_Search(int A[], int B[], int n)
 {
-    int i, j, k;
+    int i, j, k;//定义变量
     i = j = k = 0;
     
-    while (i < n && j < n)
+    while (i < n && j < n)//开始遍历
     {
         k++;
         if (A[i] < B[j])
