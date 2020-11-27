@@ -35,7 +35,7 @@ void InitStack(SqStack **s) //初始化栈
     (*s)->top = -1;
 }
 void DestroyStack(SqStack *s) //销毁栈
-{
+{       
     free(s);
 }
 bool StackEmpty(SqStack *s) //判断栈是否为空
@@ -57,7 +57,7 @@ bool Pop(SqStack *s, int *e) //出栈
     *e = s->data[s->top]; //取栈定指针元素
     s->top--;
     return true;
-}
+}   
 bool GetTop(SqStack *s, int *e) //取栈顶元素
 {
     if (s->top == -1) //栈为空的情况，栈下溢出
