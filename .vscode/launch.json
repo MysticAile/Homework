@@ -13,7 +13,7 @@
             "stopAtEntry": false,
             "cwd": "D:\\MinGW\\bin",
             "environment": [],
-            "externalConsole": false,
+            "externalConsole": true,
             "MIMode": "gdb",
             "miDebuggerPath": "D:\\MinGW\\bin\\gdb.exe",
             "setupCommands": [

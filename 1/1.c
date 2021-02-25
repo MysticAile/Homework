@@ -30,5 +30,7 @@ int main(void)
         printf("%5d", n[i]);
     }
     printf("\n");
+    system("pause");
     return 0;
 }
+    
