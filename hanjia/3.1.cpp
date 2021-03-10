@@ -2,25 +2,59 @@
 #include<cstring>
 using namespace std;
 const int maxn=1000;
-const int alphanumber=26;
+const int MAX=26;
 typedef struct {
     int weight;
     int parent,lchild,rchild;
-}HufNode;//HuffmanTree的基本定义
+}Node;//定义哈夫曼树
 typedef struct {
     int weight;
     char data;
-    char code[maxn];//需要被建树的信息
-}HufCode;
-void Init(HufCode h[])//初始化输入数据
+    char code[maxn];
+}Code;
+void initialization(Code h[])//初始化
 {
     FILE *f1=fopen("DataFile.data","r");
-    for(int i=0;i<alphanumber;++i)
+    for(int i=0;i<MAX;++i)
         fscanf(f1,"%c%d ",&h[i].data,&h[i].weight);
 
     fclose(f1);
 }
-void select(HufNode *h,int k,int &s1,int &s2)//选择两个最小的值
+void HuffmanTree(Code *h2,Node *h1,int n)
+{
+    char str[maxn];
+    int m=2*n-1;
+    for(int i=0;i<m;++i){
+        if(i<n)//前n个全部是叶子节点，
+            h1[i].weight=h2[i].weight;
+        else
+            h1[i].weight==0;
+        h1[i].lchild=h1[i].parent=h1[i].rchild=0;
+    }
+    int s1,s2;
+    for(int i=n;i<m;++i){
+        select(h1,i,s1,s2);
+        h1[s1].parent=i;//建立二叉树
+        h1[s2].parent=i;
+        h1[i].lchild=s1;
+        h1[i].rchild=s2;
+        h1[i].weight=h1[s1].weight+h1[s2].weight;
+    }
+    str[n]='\0';
+    int l;
+    for(int i=0;i<n;++i){//开始倒序遍历
+        l=n-1;
+        for(int k=i,p=h1[k].parent;p;k=p,p=h1[k].parent){//沿着叶子回溯到根节点
+            if(k==h1[p].lchild)
+                str[l]='0';
+            else
+                str[l]='1';
+            l--;
+        }
+        strcpy(h2[i].code,str+l+1);
+    }
+}
+void select(Node *h,int k,int &s1,int &s2)//选择
 {
     int i;
     for(i=0; i<k && h[i].parent != 0; ++i);//选择一个父节点为0的根节点
@@ -39,42 +73,7 @@ void select(HufNode *h,int k,int &s1,int &s2)//选择两个最小的值
             s2 = i;
     }
 }
-void HuffmanTree(HufCode *h2,HufNode *h1,int n)
-{
-    char str[maxn];
-    int m=2*n-1;
-    for(int i=0;i<m;++i){
-        if(i<n)//前n个全部是叶子节点，
-            h1[i].weight=h2[i].weight;
-        else//后面的是还没建成的树
-            h1[i].weight==0;
-        h1[i].lchild=h1[i].parent=h1[i].rchild=0;
-    }
-    int s1,s2;
-    for(int i=n;i<m;++i){
-        select(h1,i,s1,s2);
-        h1[s1].parent=i;//建立二叉树
-        h1[s2].parent=i;
-        h1[i].lchild=s1;
-        h1[i].rchild=s2;
-        h1[i].weight=h1[s1].weight+h1[s2].weight;
-    }
-    str[n]='\0';
-    int l;
-    for(int i=0;i<n;++i){//从每个叶子节点开始倒序遍历
-        l=n-1;//倒序赋值字符串
-        for(int k=i,p=h1[k].parent;p;k=p,p=h1[k].parent){//沿着叶子回溯到根节点
-            if(k==h1[p].lchild)
-                str[l]='0';
-            else
-                str[l]='1';
-            l--;
-        }
-        strcpy(h2[i].code,str+l+1);
-       // printf("%c %s\n",h2[i].data,h2[i].code);
-    }
-}
-void EnCodeing(HufCode hc[])
+void BianMa(Code HC[])//编码函数
 {
     FILE *f1=fopen("ToBeTran.data","r");
     FILE *f2=fopen("Code.txt","w");
@@ -84,21 +83,14 @@ void EnCodeing(HufCode hc[])
         int len=strlen(str);
         for(int i=0;i<len;++i){
             int x=str[i]-'a';
-            fprintf(f2,"%s",hc[x].code);
+            fprintf(f2,"%s",HC[x].code);
         }
         fprintf(f2," ");
     }
     fclose(f1);
     fclose(f2);
 }
-int Search(HufCode hc[],char *str)
-{
-    for(int i=0;i<alphanumber;++i)
-        if(strcmp(hc[i].code,str)==0)
-            return  i;
-    return -1;
-}
-void DeCodeing(HufCode hc[])
+void Decode(Code HC[])//解码函数
 {
     FILE *f1=fopen("CodeFile.data","r");
     FILE *f2=fopen("Textfile.txt","w");
@@ -111,7 +103,7 @@ void DeCodeing(HufCode hc[])
         for(int i=0;i<len;++i){
             a[k]=str[i];
             a[k+1]='\0';
-            int ans=Search(hc,a);
+            int ans=Search(HC,a);
             if(ans!=-1){
                 fprintf(f2,"%c",ans+'a');
                 k=0;
@@ -125,14 +117,21 @@ void DeCodeing(HufCode hc[])
     fclose(f1);
     fclose(f2);
 }
-void OutPut()
+int Search(Code HC[],char *str)
+{
+    for(int i=0;i<MAX;++i)
+        if(strcmp(HC[i].code,str)==0)
+            return  i;
+    return -1;
+}
+void OutPut()//输出
 {
     FILE *infile=fopen("DataFile.data","r");
     FILE *outfile=fopen("Code.txt","r");
     int w;
     char c;
     printf("各个字母及其权值\n");
-    for(int i=0;i<alphanumber;++i){
+    for(int i=0;i<MAX;++i){
         fscanf(infile,"%c %d ",&c,&w);
         printf("%c %d ",c,w);
     }
@@ -161,14 +160,15 @@ void OutPut()
     fclose(infile);
     fclose(outfile);
 }
-int main()
+int main(void)
 {
-    HufCode hc[maxn];
-    HufNode tree[maxn];
-    Init(hc);//初始化
-    HuffmanTree(hc,tree,alphanumber);//建树
-    EnCodeing(hc);//编码
-    DeCodeing(hc);//解码
-    OutPut();//输出结果
+    Code HC[maxn];
+    Node tree[maxn];
+    Init(HC);//初始化
+    HuffmanTree(HC,tree,MAX);//建树
+    BianMa(HC);//编码
+    Decode(HC);//解码
+    OutPut();//输出
+    system("pause");
     return 0;
 }
